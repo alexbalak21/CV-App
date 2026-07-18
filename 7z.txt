@@ -1,0 +1,1 @@
+7z a -r CV-App.zip . -x!env -x!.env -x!*__pycache__* -x!*.pyc -x!instance\app.db -x!instance\storage\photos\* -x!.pytest_cache
