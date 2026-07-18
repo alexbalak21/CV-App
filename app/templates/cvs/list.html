@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Mes CVs — CV Editor{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Mes CVs</h1>
+    <a href="{{ url_for('cvs.create_cv') }}" class="primary-btn"><i class="fa-solid fa-plus"></i> Nouveau CV</a>
+</div>
+
+{% if cvs %}
+<div class="cv-grid">
+    {% for cv in cvs %}
+    <div class="cv-card">
+        <h3>{{ cv.title }}</h3>
+        <p class="cv-meta">
+            {{ cv.default_template.name if cv.default_template else 'Modèle par défaut' }}
+            &middot; mis à jour {{ cv.updated_at.strftime('%d/%m/%Y') if cv.updated_at }}
+        </p>
+        <div class="cv-card-actions">
+            <a href="{{ url_for('cvs.edit_cv', cv_id=cv.id) }}" class="secondary-btn"><i class="fa-solid fa-pen"></i> Éditer</a>
+            <a href="{{ url_for('cvs.view_cv', cv_id=cv.id) }}" class="secondary-btn"><i class="fa-solid fa-eye"></i> Voir</a>
+            <a href="{{ url_for('cvs.list_versions', cv_id=cv.id) }}" class="secondary-btn"><i class="fa-solid fa-clock-rotate-left"></i> Historique</a>
+            <form method="post" action="{{ url_for('cvs.delete_cv', cv_id=cv.id) }}"
+                  onsubmit="return confirm('Supprimer ce CV ?');" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="danger-btn"><i class="fa-solid fa-trash"></i></button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="empty-state">Vous n'avez pas encore de CV. <a href="{{ url_for('cvs.create_cv') }}">Créez le premier</a>.</p>
+{% endif %}
+{% endblock %}

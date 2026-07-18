@@ -1,0 +1,113 @@
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: #1f2937;
+    background: #e5e7eb;
+}
+
+#page {
+    display: flex;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    background: #fff;
+}
+
+/* ---------- Sidebar ---------- */
+aside {
+    width: 34%;
+    background: linear-gradient(180deg, #3b4d7a 0%, #4c5f96 100%);
+    color: #fff;
+    padding: 28px 22px;
+}
+
+#photo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+#photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255,255,255,0.6);
+}
+
+.aside-block { margin-bottom: 24px; }
+.aside-title {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid rgba(255,255,255,0.35);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+}
+
+.contact-grid { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.contact-item { display: flex; align-items: center; gap: 8px; }
+.contact-item a { color: #fff; text-decoration: none; word-break: break-word; }
+.contact-item .icon { width: 16px; text-align: center; opacity: 0.85; }
+
+#skills ul, #certifications ul, #hobbies ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+}
+#skills ul li { display: flex; align-items: center; gap: 8px; }
+#skills ul li i { width: 16px; text-align: center; opacity: 0.85; }
+ul.no-bullets { list-style: none; padding: 0; margin: 0; }
+
+.lang-item { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; }
+.lang-name { font-weight: 600; }
+.lang-level { opacity: 0.85; font-size: 12px; }
+
+/* ---------- Main content ---------- */
+main { width: 66%; padding: 28px 32px; }
+
+#main-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+#name { font-size: 26px; margin: 0; color: #2d3a5e; }
+#job { font-size: 15px; font-weight: 400; margin: 4px 0 10px; color: #4b5563; }
+#links { display: flex; gap: 16px; font-size: 12.5px; }
+#links a { color: #3b4d7a; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+#header-icon { font-family: monospace; font-size: 22px; color: #94a3b8; }
+
+.section-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #3b4d7a;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 6px;
+    margin: 22px 0 10px;
+}
+main section:first-of-type .section-title { margin-top: 0; }
+main p { font-size: 13px; line-height: 1.6; margin: 0; color: #374151; }
+
+.timeline { position: relative; padding-left: 4px; }
+.timeline-item { position: relative; padding-left: 18px; padding-bottom: 16px; border-left: 2px solid #e5e7eb; }
+.timeline-item:last-child { border-left-color: transparent; padding-bottom: 0; }
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -5px; top: 4px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #3b4d7a;
+}
+.job-title { font-size: 13.5px; margin: 0 0 2px; color: #1f2937; }
+.job-meta { font-size: 12px; color: #6b7280; margin: 0 0 6px; }
+.timeline-item ul { margin: 0; padding-left: 16px; font-size: 12.5px; color: #374151; line-height: 1.5; }
+.timeline-item ul li { margin-bottom: 3px; }
+
+/* ---------- Print / A4 export ---------- */
+@media print {
+    @page { size: A4; margin: 0; }
+    body { background: #fff; }
+    #page { width: 210mm; min-height: 297mm; margin: 0; box-shadow: none; }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="{{ cv.lang or 'fr' }}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV - {{ cv_data.header.fullName }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='cv_templates/' ~ template_slug ~ '/style.css') }}">
+<style>
+    #print-toolbar { position: fixed; top: 12px; right: 12px; z-index: 100; display: flex; gap: 8px; }
+    #print-toolbar button, #print-toolbar a {
+        font-family: 'Poppins', sans-serif; font-size: 13px; border: none; border-radius: 6px;
+        padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+    }
+    #print-toolbar .print-btn { background: #2563eb; color: #fff; }
+    #print-toolbar .print-btn:hover { background: #1d4ed8; }
+    #print-toolbar .back-btn { background: #fff; color: #1f2937; border: 1px solid #d1d5db !important; }
+    #print-toolbar .back-btn:hover { background: #f3f4f6; }
+    #template-picker { position: fixed; top: 56px; right: 12px; z-index: 100; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
+    #template-picker a {
+        font-family: 'Poppins', sans-serif; font-size: 12px; background: #fff; border: 1px solid #d1d5db; border-radius: 6px;
+        padding: 6px 10px; text-decoration: none; color: #374151;
+    }
+    #template-picker a.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    @media print {
+        #print-toolbar, #template-picker { display: none !important; }
+    }
+</style>
+</head>
+<body>
+
+<div id="print-toolbar">
+    <a class="back-btn" href="{{ url_for('cvs.edit_cv', cv_id=cv.id) }}"><i class="fa-solid fa-arrow-left"></i> Retour à l'éditeur</a>
+    <button class="print-btn" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimer / PDF</button>
+</div>
+
+{% if templates|length > 1 %}
+<div id="template-picker">
+    {% for t in templates %}
+    {% if pinned_version %}
+    <a href="{{ url_for('cvs.view_version', cv_id=cv.id, version_id=pinned_version.id, template=t.slug) }}"
+       class="{{ 'active' if t.slug == template_slug else '' }}">{{ t.name }}</a>
+    {% else %}
+    <a href="{{ url_for('cvs.view_cv', cv_id=cv.id, template=t.slug) }}"
+       class="{{ 'active' if t.slug == template_slug else '' }}">{{ t.name }}</a>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{% with cv=cv_data %}
+{% include "cv_templates/" ~ template_slug ~ "/layout.html.jinja" %}
+{% endwith %}
+
+</body>
+</html>

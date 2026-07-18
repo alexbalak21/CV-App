@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Nouveau CV — CV Editor{% endblock %}
+{% block content %}
+<div class="auth-card">
+    <h1>Nouveau CV</h1>
+    <form method="post" novalidate>
+        {{ form.csrf_token }}
+        <label>{{ form.title.label }}</label>
+        {{ form.title(size=40, placeholder="ex: CV Développeur") }}
+        {% for error in form.title.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+
+        <label>{{ form.template_slug.label }}</label>
+        {{ form.template_slug() }}
+
+        <button type="submit" class="primary-btn">Créer</button>
+    </form>
+</div>
+{% endblock %}
