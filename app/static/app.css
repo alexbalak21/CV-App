@@ -30,7 +30,7 @@ html, body {
 .flash-error { background: #fee2e2; color: #991b1b; }
 .flash-info { background: #dbeafe; color: #1e40af; }
 
-#content { max-width: 1000px; margin: 24px auto; padding: 0 20px; }
+#content { margin: 24px auto; padding: 0 20px; }
 
 .auth-card {
     max-width: 420px; margin: 40px auto; background: #fff; padding: 28px;
