@@ -22,6 +22,33 @@
     <div id="editorPane">
         <form id="cvForm" onsubmit="return false;">
 
+            <details class="section" id="importExportSection">
+                <summary><i class="fa-solid fa-file-import"></i> Importer / Exporter (JSON)</summary>
+                <div class="section-body">
+                    <label>Modèle</label>
+                    <p class="section-hint">
+                        Téléchargez un exemple de fichier JSON pour voir le format attendu, remplissez-le
+                        (à la main ou avec un autre outil), puis importez-le ci-dessous.
+                    </p>
+                    <a href="{{ url_for('static', filename='cv-model.example.json') }}" download="cv-model.json" class="secondary-btn">
+                        <i class="fa-solid fa-download"></i> Télécharger le modèle JSON
+                    </a>
+                    <button type="button" id="exportJsonBtn" class="secondary-btn">
+                        <i class="fa-solid fa-file-export"></i> Exporter ce CV (JSON)
+                    </button>
+
+                    <label style="margin-top:18px;">Importer un fichier .json</label>
+                    <input type="file" id="importFileInput" accept="application/json,.json">
+
+                    <label>Ou coller le JSON directement</label>
+                    <textarea id="importPasteArea" rows="6" placeholder='{ "header": { "fullName": "...", ... } }'></textarea>
+                    <button type="button" id="importPasteBtn" class="add-btn">
+                        <i class="fa-solid fa-code"></i> Importer le JSON collé
+                    </button>
+                    <span id="importStatus"></span>
+                </div>
+            </details>
+
             <details class="section" open>
                 <summary><i class="fa-solid fa-id-card"></i> En-tête</summary>
                 <div class="section-body">
@@ -138,6 +165,7 @@
 <script>
     window.CV_EDITOR_CONFIG = {
         cvId: {{ cv.id }},
+        cvTitle: {{ cv.title | tojson }},
         initialData: {{ cv_data | tojson }},
         csrfToken: "{{ csrf_token() }}",
         endpoints: {

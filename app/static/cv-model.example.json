@@ -1,0 +1,71 @@
+{
+  "header": {
+    "fullName": "Prénom Nom",
+    "jobTitle": "Intitulé du poste recherché",
+    "photo": "",
+    "links": [
+      { "label": "LinkedIn", "text": "@votre-pseudo", "url": "https://linkedin.com/in/votre-pseudo" },
+      { "label": "Site web", "text": "www.votre-site.com", "url": "https://www.votre-site.com" }
+    ]
+  },
+  "profile": {
+    "title": "Profil",
+    "text": "Décrivez votre profil en 2-3 phrases. Utilisez **deux astérisques** pour mettre du texte en gras."
+  },
+  "contact": {
+    "title": "Contact",
+    "items": [
+      { "label": "Téléphone", "display": "(+33) 06.00.00.00.00", "href": "tel:+33600000000" },
+      { "label": "Email", "display": "vous@exemple.fr", "href": "mailto:vous@exemple.fr" },
+      { "label": "Localisation", "display": "Ville, Pays", "href": "" }
+    ]
+  },
+  "skills": {
+    "title": "Compétences",
+    "items": [
+      "[fa:solid:database] Ajoutez [fa:solid:xxx] ou [fa:brands:xxx] devant une compétence pour afficher une icône Font Awesome",
+      "Une compétence sans icône fonctionne aussi très bien"
+    ]
+  },
+  "certifications": {
+    "title": "Certifications",
+    "items": [
+      "Nom de la certification — Organisme"
+    ]
+  },
+  "languages": {
+    "title": "Langues",
+    "items": [
+      { "name": "Anglais", "level": "Courant - C1" }
+    ]
+  },
+  "hobbies": {
+    "title": "Intérêts",
+    "items": [
+      "Un centre d'intérêt par ligne"
+    ]
+  },
+  "experience": {
+    "title": "Expériences Professionnelles",
+    "items": [
+      {
+        "title": "Intitulé du poste - Entreprise",
+        "meta": "Mois AAAA – Mois AAAA",
+        "bullets": [
+          "Une réalisation ou responsabilité par ligne",
+          "**Le gras** fonctionne aussi ici"
+        ]
+      }
+    ]
+  },
+  "education": {
+    "title": "Formations",
+    "items": [
+      {
+        "title": "Nom du diplôme",
+        "meta": "École — Mois AAAA – Mois AAAA",
+        "bullets": []
+      }
+    ]
+  }
+}

@@ -43,6 +43,11 @@ input[type="text"]:focus, textarea:focus { outline: none; border-color: #2563eb;
 .timeline-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 10px; margin-bottom: 10px; background: #fff; }
 .timeline-card-head { display: flex; justify-content: flex-end; }
 
+.section-hint { font-size: 12px; color: #6b7280; margin: 0 0 10px; line-height: 1.5; }
+#importExportSection #exportJsonBtn { margin-left: 8px; }
+#importExportSection textarea { font-family: ui-monospace, monospace; font-size: 12px; }
+#importStatus { display: inline-block; margin-left: 10px; font-size: 12px; }
+
 #photoUploadRow { display: flex; align-items: center; gap: 14px; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
 #photoPreview { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: #eef1f5; border: 1px solid #d1d5db; display: none; }
 #photoPreview.has-photo { display: block; }

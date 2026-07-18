@@ -16,6 +16,11 @@
     const photoRemoveBtn = document.getElementById('photoRemoveBtn');
     const photoUploadStatus = document.getElementById('photoUploadStatus');
     const MAX_PHOTO_BYTES = 1 * 1024 * 1024;
+    const exportJsonBtn = document.getElementById('exportJsonBtn');
+    const importFileInput = document.getElementById('importFileInput');
+    const importPasteArea = document.getElementById('importPasteArea');
+    const importPasteBtn = document.getElementById('importPasteBtn');
+    const importStatus = document.getElementById('importStatus');
 
     // ---------- path helpers ----------
     function getPath(obj, path) {
@@ -391,6 +396,118 @@
             window.open(cfg.endpoints.previewView, '_blank');
         } else {
             alert("Impossible d'enregistrer avant l'aperçu.");
+        }
+    });
+
+    // ---------- import / export JSON ----------
+    function blankCvData() {
+        return {
+            header: { fullName: '', jobTitle: '', photo: '', links: [] },
+            profile: { title: 'Profil', text: '' },
+            contact: { title: 'Contact', items: [] },
+            skills: { title: 'Compétences', items: [] },
+            certifications: { title: 'Certifications', items: [] },
+            languages: { title: 'Langues', items: [] },
+            hobbies: { title: 'Intérêts', items: [] },
+            experience: { title: 'Expériences Professionnelles', items: [] },
+            education: { title: 'Formations', items: [] },
+        };
+    }
+
+    // Mirrors app/cv_schema.py's normalize_cv_data(): fills in any missing
+    // top-level sections so a partial/hand-edited JSON file still loads
+    // cleanly instead of breaking the form or the preview.
+    function normalizeCvData(data) {
+        const base = blankCvData();
+        if (!data || typeof data !== 'object' || Array.isArray(data)) return base;
+        for (const key of Object.keys(base)) {
+            const incoming = data[key];
+            if (incoming && typeof incoming === 'object' && !Array.isArray(incoming)) {
+                base[key] = { ...base[key], ...incoming };
+            } else if (incoming !== undefined && incoming !== null) {
+                base[key] = incoming;
+            }
+        }
+        return base;
+    }
+
+    function downloadJsonBlob(obj, filename) {
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function applyImportedData(parsed) {
+        state = normalizeCvData(parsed);
+        bindStaticFields();
+        rebuildDynamicSections();
+        updatePhotoPreview();
+        markDirty();
+        scheduleRender();
+    }
+
+    function setImportStatus(text, color) {
+        importStatus.textContent = text;
+        importStatus.style.color = color;
+        if (text) setTimeout(() => { if (importStatus.textContent === text) importStatus.textContent = ''; }, 4000);
+    }
+
+    function confirmOverwrite() {
+        return confirm(
+            "Importer ce JSON va remplacer le contenu actuel de l'éditeur (non enregistré si vous n'avez pas cliqué sur Enregistrer). Continuer ?"
+        );
+    }
+
+    exportJsonBtn.addEventListener('click', () => {
+        const filenameSafe = (cfg.cvTitle || 'cv').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        downloadJsonBlob(state, `${filenameSafe || 'cv'}.json`);
+    });
+
+    importFileInput.addEventListener('change', () => {
+        const file = importFileInput.files[0];
+        if (!file) return;
+        if (!confirmOverwrite()) {
+            importFileInput.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const parsed = JSON.parse(reader.result);
+                applyImportedData(parsed);
+                setImportStatus('Fichier importé.', '#16a34a');
+            } catch (e) {
+                setImportStatus('JSON invalide : ' + e.message, '#dc2626');
+            }
+            importFileInput.value = '';
+        };
+        reader.onerror = () => {
+            setImportStatus('Impossible de lire le fichier.', '#dc2626');
+            importFileInput.value = '';
+        };
+        reader.readAsText(file);
+    });
+
+    importPasteBtn.addEventListener('click', () => {
+        const text = importPasteArea.value.trim();
+        if (!text) {
+            setImportStatus('Collez du JSON avant d\'importer.', '#dc2626');
+            return;
+        }
+        if (!confirmOverwrite()) return;
+        try {
+            const parsed = JSON.parse(text);
+            applyImportedData(parsed);
+            importPasteArea.value = '';
+            setImportStatus('JSON importé.', '#16a34a');
+        } catch (e) {
+            setImportStatus('JSON invalide : ' + e.message, '#dc2626');
         }
     });
 
