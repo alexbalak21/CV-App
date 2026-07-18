@@ -76,7 +76,10 @@ def process_and_save_photo(file_storage, user_id: int, max_upload_bytes: int,
 
     photo = Photo(
         user_id=user_id,
-        storage_path=str(Path(str(user_id)) / filename),  # relative, stored path
+        storage_path=f"{user_id}/{filename}",  # always forward-slash: this gets
+        # passed to Werkzeug's safe_join() via send_from_directory(), which
+        # rejects backslashes on Windows as a security precaution — using
+        # pathlib's OS-native separator here would silently 404 on Windows.
         variant=variant,
         width=size[0],
         height=size[1],

@@ -1,3 +1,4 @@
+import io
 import json
 
 from app.models import CV, CVVersion, User
@@ -135,3 +136,95 @@ def test_render_preview_escapes_html_injection(client, registered_user):
     html = resp.get_json()["html"]
     assert "<script>" not in html
     assert "&lt;script&gt;" in html
+
+
+def test_photo_storage_path_uses_forward_slash(client, registered_user, app, tmp_path):
+    """Regression test: storage_path must never contain a backslash.
+
+    Werkzeug's safe_join() (used internally by send_from_directory in
+    serve_photo) silently rejects any path containing a backslash on
+    Windows, turning it into a 404 with nothing logged as an error. This
+    only reproduces on Windows (os.sep == '\\'), which is why it's asserted
+    directly on the string rather than relying on a live 404 in CI.
+    """
+    _login(client, registered_user)
+    _create_cv(client)
+
+    app.config["PHOTOS_DIR"] = str(tmp_path)
+    img_bytes = _make_test_jpeg_bytes()
+
+    resp = client.post(
+        "/cvs/1/photo",
+        data={"variant": "200", "photo": (io.BytesIO(img_bytes), "test.jpg")},
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+
+    with app.app_context():
+        from app.models import Photo
+        photo = Photo.query.first()
+        assert photo is not None
+        assert "\\" not in photo.storage_path, (
+            f"storage_path contains a backslash: {photo.storage_path!r} — "
+            "this will 404 on Windows via safe_join()"
+        )
+        assert "/" in photo.storage_path
+
+
+def test_uploaded_photo_is_immediately_servable(client, registered_user, app, tmp_path):
+    _login(client, registered_user)
+    _create_cv(client)
+
+    app.config["PHOTOS_DIR"] = str(tmp_path)
+    img_bytes = _make_test_jpeg_bytes()
+
+    upload_resp = client.post(
+        "/cvs/1/photo",
+        data={"variant": "200", "photo": (io.BytesIO(img_bytes), "test.jpg")},
+        content_type="multipart/form-data",
+    )
+    assert upload_resp.status_code == 200
+    photo_url = upload_resp.get_json()["url"]
+
+    get_resp = client.get(photo_url)
+    assert get_resp.status_code == 200
+    assert get_resp.content_type == "image/jpeg"
+
+
+def test_serve_photo_normalizes_legacy_backslash_paths(client, registered_user, app, tmp_path):
+    """Rows created before the storage_path fix may have backslashes
+    (Windows os-native separator). serve_photo should normalize and still
+    find the file rather than 404 forever on old data."""
+    _login(client, registered_user)
+    _create_cv(client)
+    app.config["PHOTOS_DIR"] = str(tmp_path)
+
+    with app.app_context():
+        from app.extensions import db
+        from app.models import Photo
+
+        user_dir = tmp_path / "1"
+        user_dir.mkdir(parents=True, exist_ok=True)
+        (user_dir / "legacy.jpg").write_bytes(_make_test_jpeg_bytes())
+
+        legacy_photo = Photo(
+            user_id=1,
+            storage_path="1\\legacy.jpg",  # simulates a pre-fix Windows row
+            variant="200",
+            width=200,
+            height=200,
+            filesize_bytes=100,
+        )
+        db.session.add(legacy_photo)
+        db.session.commit()
+        photo_id = legacy_photo.id
+
+    resp = client.get(f"/cvs/photos/{photo_id}")
+    assert resp.status_code == 200
+
+
+def _make_test_jpeg_bytes() -> bytes:
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGB", (300, 300), color=(120, 140, 200)).save(buf, format="JPEG")
+    return buf.getvalue()

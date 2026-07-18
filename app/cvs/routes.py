@@ -193,7 +193,13 @@ def serve_photo(photo_id):
     photo = Photo.query.get_or_404(photo_id)
     if photo.user_id != current_user.id:
         abort(404)
-    return send_from_directory(current_app.config["PHOTOS_DIR"], photo.storage_path)
+    # Defensive: older rows created before the storage_path fix may have
+    # been saved with OS-native (backslash) separators on Windows, which
+    # Werkzeug's safe_join()/send_from_directory() rejects outright. New
+    # uploads always store forward slashes (see photo_service.py), but we
+    # normalize here too so already-uploaded photos don't 404 forever.
+    normalized_path = photo.storage_path.replace("\\", "/")
+    return send_from_directory(current_app.config["PHOTOS_DIR"], normalized_path)
 
 
 @cvs_bp.route("/<int:cv_id>/versions")
