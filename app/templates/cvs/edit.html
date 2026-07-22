@@ -168,6 +168,7 @@
         cvTitle: {{ cv.title | tojson }},
         initialData: {{ cv_data | tojson }},
         csrfToken: "{{ csrf_token() }}",
+        templateStylesheetUrl: "{{ url_for('cvs.serve_template_asset', slug=template_slug, filename='style.css') }}",
         endpoints: {
             save: "{{ url_for('cvs.save_cv', cv_id=cv.id) }}",
             render: "{{ url_for('cvs.render_preview', cv_id=cv.id) }}",

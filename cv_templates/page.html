@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume - {{FULL_NAME}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="page">
+
+        <!-- ===================== ASIDE / SIDEBAR ===================== -->
+        <aside>
+            <div id="photo-container">
+                <img src="photo.jpg" alt="Profile photo" id="photo">
+            </div>
+
+            <div class="aside-block" id="contact">
+                <h3 class="aside-title">{{CONTACT_TITLE}}</h3>
+                <div class="contact-grid">
+                    {{CONTACT}}
+                </div>
+            </div>
+
+            <div class="aside-block" id="skills">
+                <h3 class="aside-title">{{SKILLS_TITLE}}</h3>
+                {{SKILLS}}
+            </div>
+
+            <div class="aside-block" id="certifications">
+                <h3 class="aside-title">{{CERTIFICATIONS_TITLE}}</h3>
+                {{CERTIFICATIONS}}
+            </div>
+
+            <div class="aside-block" id="languages">
+                <h3 class="aside-title">{{LANGUAGES_TITLE}}</h3>
+                {{LANGUAGES}}
+            </div>
+
+            <div class="aside-block" id="hobbies">
+                <h3 class="aside-title">{{HOBBIES_TITLE}}</h3>
+                {{HOBBIES}}
+            </div>
+        </aside>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <main>
+            <header id="main-header">
+                <div id="header-text">
+                    <h1 id="name">{{FULL_NAME}}</h1>
+                    <h2 id="job">{{JOB_TITLE}}</h2>
+                    <div id="links">
+                        {{LINKS}}
+                    </div>
+                </div>
+                <div id="header-icon">&lt;/&gt;</div>
+            </header>
+
+            <section id="profile">
+                <h3 class="section-title">{{PROFILE_TITLE}}</h3>
+                {{PROFILE}}
+            </section>
+
+            <section id="experience">
+                <h3 class="section-title">{{EXPERIENCE_TITLE}}</h3>
+                <div class="timeline">
+                    {{EXPERIENCE}}
+                </div>
+            </section>
+
+            <section id="education">
+                <h3 class="section-title">{{EDUCATION_TITLE}}</h3>
+                <div class="timeline">
+                    {{EDUCATION}}
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

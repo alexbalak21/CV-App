@@ -1,8 +1,10 @@
+import os
 import re
 from functools import wraps
 
 from flask import (
-    Blueprint, render_template, redirect, url_for, flash, request, jsonify, abort, current_app
+    Blueprint, render_template, redirect, url_for, flash, request, jsonify, abort,
+    current_app, send_from_directory,
 )
 from flask_login import login_required, current_user
 
@@ -101,7 +103,10 @@ def create_cv():
 def edit_cv(cv: CV):
     templates = Template.query.filter_by(is_active=True).all()
     data = normalize_cv_data(cv.current_version.data if cv.current_version else blank_cv_data())
-    return render_template("cvs/edit.html", cv=cv, cv_data=data, templates=templates)
+    template_slug = _resolve_template_slug(cv, None)
+    return render_template(
+        "cvs/edit.html", cv=cv, cv_data=data, templates=templates, template_slug=template_slug
+    )
 
 
 @cvs_bp.route("/<int:cv_id>/save", methods=["POST"])
@@ -147,6 +152,27 @@ def _resolve_template_slug(cv: CV, requested_slug: str | None) -> str:
     return fallback.slug if fallback else "classic_sidebar"
 
 
+@cvs_bp.route("/template-assets/<slug>/<path:filename>")
+def serve_template_asset(slug, filename):
+    """
+    Serves a CV template package's static files (style.css, thumbnails,
+    etc.) from app/storage/cv_templates/<slug>/.
+
+    These live outside app/static/, so url_for('static', ...) can't reach
+    them — this route stands in for that. `slug` is validated against the
+    templates table first (same pattern as _resolve_template_slug) so this
+    isn't an open "read any file under storage/" endpoint; send_from_directory
+    additionally guards `filename` against path traversal on top of that.
+    Deliberately not behind @login_required: CSS/thumbnails aren't
+    sensitive, and this keeps <link>/<img> tags simple in every template.
+    """
+    if not Template.query.filter_by(slug=slug, is_active=True).first():
+        abort(404)
+    return send_from_directory(
+        os.path.join(current_app.config["CV_TEMPLATES_DIR"], slug), filename
+    )
+
+
 @cvs_bp.route("/<int:cv_id>/render-preview", methods=["POST"])
 @login_required
 @owns_cv
@@ -155,7 +181,7 @@ def render_preview(cv: CV):
     data = normalize_cv_data(payload.get("data") or {})
     template_slug = _resolve_template_slug(cv, payload.get("template"))
 
-    html = render_template(f"cv_templates/{template_slug}/layout.html.jinja", cv=data)
+    html = render_template(f"cv_templates/{template_slug}/page.html", cv=data)
     return jsonify({"html": html})
 
 
@@ -187,7 +213,6 @@ def upload_photo(cv: CV):
 @cvs_bp.route("/photos/<int:photo_id>")
 @login_required
 def serve_photo(photo_id):
-    from flask import send_from_directory
     from app.models import Photo
 
     photo = Photo.query.get_or_404(photo_id)

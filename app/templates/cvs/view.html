@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
-<link rel="stylesheet" href="{{ url_for('static', filename='cv_templates/' ~ template_slug ~ '/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('cvs.serve_template_asset', slug=template_slug, filename='style.css') }}">
 <style>
     #print-toolbar { position: fixed; top: 12px; right: 12px; z-index: 100; display: flex; gap: 8px; }
     #print-toolbar button, #print-toolbar a {
@@ -51,7 +51,7 @@
 {% endif %}
 
 {% with cv=cv_data %}
-{% include "cv_templates/" ~ template_slug ~ "/layout.html.jinja" %}
+{% include "cv_templates/" ~ template_slug ~ "/page.html" %}
 {% endwith %}
 
 </body>
