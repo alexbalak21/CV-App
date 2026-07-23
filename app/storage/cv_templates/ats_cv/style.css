@@ -1,0 +1,231 @@
+/* ==========================================================
+   RESET & BASE
+   ATS-friendly: plain single column, standard font stack,
+   no color-only meaning, no icon-font dependency, no tables/
+   floats that resume parsers commonly mis-read.
+   ========================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #e9e9e9;
+    color: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+a {
+    color: #1a1a1a;
+    text-decoration: underline;
+}
+
+ul {
+    list-style: disc;
+    padding-left: 18px;
+}
+
+/* Icons are decorative only in this template — hidden outright so the
+   layout never depends on an icon font loading correctly (some ATS
+   PDF-rendering pipelines handle icon fonts inconsistently). */
+.icon {
+    display: none;
+}
+
+/* ==========================================================
+   PAGE — A4 FORMAT (210mm x 297mm), single column
+   ========================================================== */
+#page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+    padding: 26px 34px;
+}
+
+/* ==========================================================
+   HEADER
+   ========================================================== */
+#main-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+#photo-container {
+    flex-shrink: 0;
+}
+
+#photo-container img,
+#photo {
+    width: 84px;
+    height: 84px;
+    border-radius: 4px;
+    object-fit: cover;
+    background: #e5e5e5;
+}
+
+#name {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+#job {
+    font-size: 14px;
+    font-weight: 400;
+    color: #444;
+    margin-top: 3px;
+}
+
+/* ==========================================================
+   SECTIONS (shared)
+   ========================================================== */
+section {
+    margin-bottom: 14px;
+}
+
+.section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 1px solid #999;
+    padding-bottom: 3px;
+    margin-bottom: 8px;
+}
+
+section p,
+section li,
+.contact-line,
+.links-line {
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+
+/* ==========================================================
+   CONTACT
+   ========================================================== */
+.contact-line,
+.links-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+}
+
+.contact-line .contact-item,
+.links-line a {
+    white-space: nowrap;
+}
+
+.links-line {
+    margin-top: 3px;
+}
+
+/* ==========================================================
+   SKILLS / CERTIFICATIONS / HOBBIES — plain lists,
+   no columns, no icon bullets: maximum parseability
+   ========================================================== */
+#skills ul,
+#certifications ul,
+#hobbies ul {
+    padding-left: 18px;
+}
+
+#skills ul li,
+#certifications ul li,
+#hobbies ul li {
+    margin-bottom: 3px;
+}
+
+ul.no-bullets {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* ==========================================================
+   LANGUAGES
+   ========================================================== */
+.lang-item {
+    display: flex;
+    gap: 8px;
+    font-size: 12.5px;
+    margin-bottom: 3px;
+}
+
+.lang-name {
+    font-weight: 700;
+    min-width: 90px;
+}
+
+.lang-level {
+    color: #444;
+}
+
+/* ==========================================================
+   TIMELINE (experience / education) — plain stacked blocks,
+   no absolute-positioned lines/dots that can confuse parsers
+   ========================================================== */
+.timeline-item {
+    margin-bottom: 10px;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.job-title {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.job-meta {
+    font-size: 12px;
+    color: #444;
+    font-style: italic;
+    margin-bottom: 3px;
+}
+
+.timeline-item ul {
+    margin-top: 3px;
+    font-size: 12.5px;
+}
+
+.timeline-item ul li {
+    margin-bottom: 2px;
+}
+
+/* ==========================================================
+   PRINT / PDF EXPORT
+   ========================================================== */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    html, body {
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #page {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    @page {
+        size: A4;
+        margin: 14mm;
+    }
+}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume - {{FULL_NAME}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Arial:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="page">
+
+        <!-- ===================== HEADER ===================== -->
+        <header id="main-header">
+            <div id="photo-container">
+                <img src="photo.jpg" alt="Profile photo" id="photo">
+            </div>
+            <div id="header-text">
+                <h1 id="name">{{FULL_NAME}}</h1>
+                <h2 id="job">{{JOB_TITLE}}</h2>
+            </div>
+        </header>
+
+        <!-- ===================== CONTACT ===================== -->
+        <section id="contact">
+            <h3 class="section-title">{{CONTACT_TITLE}}</h3>
+            <div class="contact-line">
+                {{CONTACT}}
+            </div>
+            <div class="links-line">
+                {{LINKS}}
+            </div>
+        </section>
+
+        <!-- ===================== PROFILE ===================== -->
+        <section id="profile">
+            <h3 class="section-title">{{PROFILE_TITLE}}</h3>
+            {{PROFILE}}
+        </section>
+
+        <!-- ===================== EXPERIENCE ===================== -->
+        <section id="experience">
+            <h3 class="section-title">{{EXPERIENCE_TITLE}}</h3>
+            <div class="timeline">
+                {{EXPERIENCE}}
+            </div>
+        </section>
+
+        <!-- ===================== EDUCATION ===================== -->
+        <section id="education">
+            <h3 class="section-title">{{EDUCATION_TITLE}}</h3>
+            <div class="timeline">
+                {{EDUCATION}}
+            </div>
+        </section>
+
+        <!-- ===================== SKILLS ===================== -->
+        <section id="skills">
+            <h3 class="section-title">{{SKILLS_TITLE}}</h3>
+            {{SKILLS}}
+        </section>
+
+        <!-- ===================== CERTIFICATIONS ===================== -->
+        <section id="certifications">
+            <h3 class="section-title">{{CERTIFICATIONS_TITLE}}</h3>
+            {{CERTIFICATIONS}}
+        </section>
+
+        <!-- ===================== LANGUAGES ===================== -->
+        <section id="languages">
+            <h3 class="section-title">{{LANGUAGES_TITLE}}</h3>
+            {{LANGUAGES}}
+        </section>
+
+        <!-- ===================== HOBBIES ===================== -->
+        <section id="hobbies">
+            <h3 class="section-title">{{HOBBIES_TITLE}}</h3>
+            {{HOBBIES}}
+        </section>
+
+    </div>
+</body>
+</html>

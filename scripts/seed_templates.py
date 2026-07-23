@@ -16,6 +16,12 @@ BUILTIN_TEMPLATES = [
         "description": "Mise en page à deux colonnes avec barre latérale bleue — le modèle original.",
         "thumbnail_path": "cv_templates/classic_sidebar/thumbnail.png",
     },
+    {
+        "slug": "ats_cv",
+        "name": "ATS Friendly",
+        "description": "Colonne unique, sans icônes ni mise en page complexe — optimisé pour les lecteurs ATS.",
+        "thumbnail_path": "cv_templates/ats_cv/thumbnail.png",
+    },
     # Add more templates here as they're built (Phase 3 of plan.md):
     # {"slug": "minimal", "name": "Minimal", ...},
     # {"slug": "two_column_timeline", "name": "Two Column Timeline", ...},

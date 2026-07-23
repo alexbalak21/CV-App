@@ -1,0 +1,8 @@
+implement Components
+implement astro frontend
+Implement Tailwind css.
+Implement visitor profiles.
+
+Implement Admin simple dashboard.
+Implement the admin be able to upload cv package : package_name.zip : page.html + style.css
+Implement the users to be able to click forget password and receive mail form server with link to reset password.
