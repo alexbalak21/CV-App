@@ -1,124 +1,84 @@
-{# Expects a `cv` dict matching app.cv_schema.blank_cv_data()'s shape. #}
-<div id="page">
-    <aside>
-        {% if cv.header.photo %}
-        <div id="photo-container">
-            <img src="{{ cv.header.photo }}" alt="Profile photo" id="photo">
-        </div>
-        {% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume - {{FULL_NAME}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="page">
 
-        <div class="aside-block" id="contact">
-            <h3 class="aside-title">{{ cv.contact.title | cv_inline }}</h3>
-            <div class="contact-grid">
-                {% for item in cv.contact['items'] %}
-                <div class="contact-item">
-                    <span class="icon"><i class="fa-solid {{ item.label | contact_icon_class }}"></i></span>
-                    {% if item.href %}
-                    <a href="{{ item.href }}">{{ item.display | cv_inline }}</a>
-                    {% else %}
-                    {{ item.display | cv_inline }}
-                    {% endif %}
-                </div>
-                {% endfor %}
+        <!-- ===================== ASIDE / SIDEBAR ===================== -->
+        <aside>
+            <div id="photo-container">
+                <img src="photo.jpg" alt="Profile photo" id="photo">
             </div>
-        </div>
 
-        <div class="aside-block" id="skills">
-            <h3 class="aside-title">{{ cv.skills.title | cv_inline }}</h3>
-            <ul>
-                {% for skill in cv.skills['items'] %}
-                <li>{{ skill | cv_inline }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="aside-block" id="certifications">
-            <h3 class="aside-title">{{ cv.certifications.title | cv_inline }}</h3>
-            <ul class="no-bullets">
-                {% for cert in cv.certifications['items'] %}
-                <li>{{ cert | cv_inline }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <div class="aside-block" id="languages">
-            <h3 class="aside-title">{{ cv.languages.title | cv_inline }}</h3>
-            {% for lang in cv.languages['items'] %}
-            <div class="lang-item">
-                <span class="lang-name">{{ lang.name | cv_inline }}</span>
-                <span class="lang-level">{{ lang.level | cv_inline }}</span>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="aside-block" id="hobbies">
-            <h3 class="aside-title">{{ cv.hobbies.title | cv_inline }}</h3>
-            <ul class="no-bullets">
-                {% for hobby in cv.hobbies['items'] %}
-                <li>{{ hobby | cv_inline }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </aside>
-
-    <main>
-        <header id="main-header">
-            <div id="header-text">
-                <h1 id="name">{{ cv.header.fullName | cv_inline }}</h1>
-                <h2 id="job">{{ cv.header.jobTitle | cv_inline }}</h2>
-                <div id="links">
-                    {% for link in cv.header.links %}
-                    <a href="{{ link.url }}" target="_blank">
-                        <span class="icon"><i class="{{ link.label | link_icon_class }}"></i></span>
-                        {{ link.text | cv_inline }}
-                    </a>
-                    {% endfor %}
+            <div class="aside-block" id="contact">
+                <h3 class="aside-title">{{CONTACT_TITLE}}</h3>
+                <div class="contact-grid">
+                    {{CONTACT}}
                 </div>
             </div>
-            <div id="header-icon">&lt;/&gt;</div>
-        </header>
 
-        <section id="profile">
-            <h3 class="section-title">{{ cv.profile.title | cv_inline }}</h3>
-            <p>{{ cv.profile.text | cv_inline }}</p>
-        </section>
-
-        <section id="experience">
-            <h3 class="section-title">{{ cv.experience.title | cv_inline }}</h3>
-            <div class="timeline">
-                {% for item in cv.experience['items'] %}
-                <div class="timeline-item">
-                    <h4 class="job-title">{{ item.title | cv_inline }}</h4>
-                    <p class="job-meta">{{ item.meta | cv_inline }}</p>
-                    {% if item.bullets %}
-                    <ul>
-                        {% for bullet in item.bullets %}
-                        <li>{{ bullet | cv_inline }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                {% endfor %}
+            <div class="aside-block" id="skills">
+                <h3 class="aside-title">{{SKILLS_TITLE}}</h3>
+                {{SKILLS}}
             </div>
-        </section>
 
-        <section id="education">
-            <h3 class="section-title">{{ cv.education.title | cv_inline }}</h3>
-            <div class="timeline">
-                {% for item in cv.education['items'] %}
-                <div class="timeline-item">
-                    <h4 class="job-title">{{ item.title | cv_inline }}</h4>
-                    <p class="job-meta">{{ item.meta | cv_inline }}</p>
-                    {% if item.bullets %}
-                    <ul>
-                        {% for bullet in item.bullets %}
-                        <li>{{ bullet | cv_inline }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
-                </div>
-                {% endfor %}
+            <div class="aside-block" id="certifications">
+                <h3 class="aside-title">{{CERTIFICATIONS_TITLE}}</h3>
+                {{CERTIFICATIONS}}
             </div>
-        </section>
-    </main>
-</div>
+
+            <div class="aside-block" id="languages">
+                <h3 class="aside-title">{{LANGUAGES_TITLE}}</h3>
+                {{LANGUAGES}}
+            </div>
+
+            <div class="aside-block" id="hobbies">
+                <h3 class="aside-title">{{HOBBIES_TITLE}}</h3>
+                {{HOBBIES}}
+            </div>
+        </aside>
+
+        <!-- ===================== MAIN CONTENT ===================== -->
+        <main>
+            <header id="main-header">
+                <div id="header-text">
+                    <h1 id="name">{{FULL_NAME}}</h1>
+                    <h2 id="job">{{JOB_TITLE}}</h2>
+                    <div id="links">
+                        {{LINKS}}
+                    </div>
+                </div>
+                <div id="header-icon">&lt;/&gt;</div>
+            </header>
+
+            <section id="profile">
+                <h3 class="section-title">{{PROFILE_TITLE}}</h3>
+                {{PROFILE}}
+            </section>
+
+            <section id="experience">
+                <h3 class="section-title">{{EXPERIENCE_TITLE}}</h3>
+                <div class="timeline">
+                    {{EXPERIENCE}}
+                </div>
+            </section>
+
+            <section id="education">
+                <h3 class="section-title">{{EDUCATION_TITLE}}</h3>
+                <div class="timeline">
+                    {{EDUCATION}}
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

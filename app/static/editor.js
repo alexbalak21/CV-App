@@ -69,12 +69,10 @@
 
     async function renderPreview() {
         const result = await apiPostJson(cfg.endpoints.render, { data: state });
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-            <link rel="stylesheet" href="${cfg.templateStylesheetUrl}">
-            </head><body>${result.html || ''}</body></html>`;
-        previewFrame.srcdoc = doc;
+        // The server now returns a complete, self-contained HTML document
+        // (page.html already has its own <head> with fonts/Font Awesome/
+        // style.css resolved) — no need to re-wrap it here.
+        previewFrame.srcdoc = result.html || '';
     }
 
     // ---------- static field binding ----------

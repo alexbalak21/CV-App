@@ -12,7 +12,7 @@ from app.extensions import db
 from app.models import CV, CVVersion, Template
 from app.cvs.forms import CreateCVForm
 from app.cv_schema import blank_cv_data, normalize_cv_data
-from app.services.cv_renderer import cv_inline_filter  # noqa: F401 (used via jinja filter, kept for clarity)
+from app.services.page_template_renderer import render_page
 from app.services.photo_service import (
     process_and_save_photo, PhotoTooLarge, PhotoInvalidFormat
 )
@@ -103,10 +103,7 @@ def create_cv():
 def edit_cv(cv: CV):
     templates = Template.query.filter_by(is_active=True).all()
     data = normalize_cv_data(cv.current_version.data if cv.current_version else blank_cv_data())
-    template_slug = _resolve_template_slug(cv, None)
-    return render_template(
-        "cvs/edit.html", cv=cv, cv_data=data, templates=templates, template_slug=template_slug
-    )
+    return render_template("cvs/edit.html", cv=cv, cv_data=data, templates=templates)
 
 
 @cvs_bp.route("/<int:cv_id>/save", methods=["POST"])
@@ -152,6 +149,12 @@ def _resolve_template_slug(cv: CV, requested_slug: str | None) -> str:
     return fallback.slug if fallback else "classic_sidebar"
 
 
+def _read_page_html(slug: str) -> str:
+    path = os.path.join(current_app.config["CV_TEMPLATES_DIR"], slug, "page.html")
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
 @cvs_bp.route("/template-assets/<slug>/<path:filename>")
 def serve_template_asset(slug, filename):
     """
@@ -181,7 +184,9 @@ def render_preview(cv: CV):
     data = normalize_cv_data(payload.get("data") or {})
     template_slug = _resolve_template_slug(cv, payload.get("template"))
 
-    html = render_template(f"cv_templates/{template_slug}/page.html", cv=data)
+    page_html = _read_page_html(template_slug)
+    style_url = url_for("cvs.serve_template_asset", slug=template_slug, filename="style.css")
+    html = render_page(page_html, data, style_url)
     return jsonify({"html": html})
 
 
@@ -267,6 +272,54 @@ def restore_version(cv: CV, version_id: int):
     return redirect(url_for("cvs.edit_cv", cv_id=cv.id))
 
 
+def _inject_view_toolbar(html: str, cv: CV, templates: list, current_slug: str,
+                          pinned_version_id: int | None = None) -> str:
+    """
+    Splices a small floating toolbar (back-to-editor + print button, plus a
+    template picker if more than one template is active) right after the
+    opening <body> tag of an already-rendered CV page. Done via plain
+    string insertion — not Jinja — since page.html is now a fully
+    self-contained static file the renderer never parses as a template.
+    """
+    back_url = url_for("cvs.edit_cv", cv_id=cv.id)
+
+    picker_links = ""
+    if len(templates) > 1:
+        for t in templates:
+            if pinned_version_id:
+                link_url = url_for(
+                    "cvs.view_version", cv_id=cv.id, version_id=pinned_version_id, template=t.slug
+                )
+            else:
+                link_url = url_for("cvs.view_cv", cv_id=cv.id, template=t.slug)
+            active = " active" if t.slug == current_slug else ""
+            picker_links += f'<a class="cvapp-tpl-link{active}" href="{link_url}">{t.name}</a>'
+    picker_html = f'<div id="cvapp-template-picker">{picker_links}</div>' if picker_links else ""
+
+    toolbar = f"""
+<div id="cvapp-print-toolbar">
+    <a class="cvapp-back-btn" href="{back_url}"><i class="fa-solid fa-arrow-left"></i> Retour à l'éditeur</a>
+    <button class="cvapp-print-btn" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimer / PDF</button>
+</div>
+{picker_html}
+<style>
+#cvapp-print-toolbar {{ position: fixed; top: 12px; right: 12px; z-index: 999999; display: flex; gap: 8px; font-family: 'Poppins', sans-serif; }}
+#cvapp-print-toolbar a, #cvapp-print-toolbar button {{ font-size: 13px; border: none; border-radius: 6px; padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }}
+#cvapp-print-toolbar .cvapp-print-btn {{ background: #2563eb; color: #fff; }}
+#cvapp-print-toolbar .cvapp-back-btn {{ background: #fff; color: #1f2937; border: 1px solid #d1d5db; }}
+#cvapp-template-picker {{ position: fixed; top: 56px; right: 12px; z-index: 999999; display: flex; flex-direction: column; gap: 6px; align-items: flex-end; font-family: 'Poppins', sans-serif; }}
+#cvapp-template-picker a {{ font-size: 12px; background: #fff; border: 1px solid #d1d5db; border-radius: 6px; padding: 6px 10px; text-decoration: none; color: #374151; }}
+#cvapp-template-picker a.active {{ background: #2563eb; color: #fff; border-color: #2563eb; }}
+@media print {{ #cvapp-print-toolbar, #cvapp-template-picker {{ display: none !important; }} }}
+</style>"""
+
+    match = re.search(r"<body[^>]*>", html)
+    if not match:
+        return toolbar + html
+    insert_at = match.end()
+    return html[:insert_at] + toolbar + html[insert_at:]
+
+
 @cvs_bp.route("/<int:cv_id>/view")
 @login_required
 @owns_cv
@@ -274,9 +327,12 @@ def view_cv(cv: CV):
     template_slug = _resolve_template_slug(cv, request.args.get("template"))
     data = normalize_cv_data(cv.current_version.data if cv.current_version else blank_cv_data())
     templates = Template.query.filter_by(is_active=True).all()
-    return render_template(
-        "cvs/view.html", cv=cv, cv_data=data, template_slug=template_slug, templates=templates
-    )
+
+    page_html = _read_page_html(template_slug)
+    style_url = url_for("cvs.serve_template_asset", slug=template_slug, filename="style.css")
+    html = render_page(page_html, data, style_url)
+    html = _inject_view_toolbar(html, cv, templates, template_slug)
+    return html
 
 
 @cvs_bp.route("/<int:cv_id>/versions/<int:version_id>/view")
@@ -286,10 +342,13 @@ def view_version(cv: CV, version_id: int):
     version = CVVersion.query.filter_by(id=version_id, cv_id=cv.id).first_or_404()
     template_slug = _resolve_template_slug(cv, request.args.get("template"))
     data = normalize_cv_data(version.data)
-    return render_template(
-        "cvs/view.html", cv=cv, cv_data=data, template_slug=template_slug,
-        templates=Template.query.filter_by(is_active=True).all(), pinned_version=version,
-    )
+    templates = Template.query.filter_by(is_active=True).all()
+
+    page_html = _read_page_html(template_slug)
+    style_url = url_for("cvs.serve_template_asset", slug=template_slug, filename="style.css")
+    html = render_page(page_html, data, style_url)
+    html = _inject_view_toolbar(html, cv, templates, template_slug, pinned_version_id=version.id)
+    return html
 
 
 @cvs_bp.route("/<int:cv_id>/delete", methods=["POST"])

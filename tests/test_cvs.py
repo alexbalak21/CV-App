@@ -223,6 +223,75 @@ def test_serve_photo_normalizes_legacy_backslash_paths(client, registered_user, 
     assert resp.status_code == 200
 
 
+def test_view_cv_renders_full_standalone_page(client, registered_user, app):
+    """view_cv should return a complete, self-contained HTML document (not
+    a fragment) with the CV content substituted and no leftover {{TOKENS}}.
+    This route had zero test coverage before — a routing bug here (stray
+    decorators misattached to a helper function) shipped silently and was
+    only caught by manual live testing, not by this suite."""
+    _login(client, registered_user)
+    _create_cv(client)
+    client.post("/cvs/1/save", json={"data": {
+        "header": {"fullName": "View Test Name", "jobTitle": "Tester", "photo": "", "links": []},
+    }})
+
+    resp = client.get("/cvs/1/view")
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert html.strip().startswith("<!DOCTYPE html>")
+    assert "View Test Name" in html
+    assert "{{" not in html  # no leftover unsubstituted placeholders
+    assert "cvapp-print-toolbar" in html  # back/print toolbar injected
+    assert "/cvs/1/edit" in html  # back-to-editor link present
+
+
+def test_view_cv_hides_photo_container_when_no_photo(client, registered_user):
+    _login(client, registered_user)
+    _create_cv(client)
+    client.post("/cvs/1/save", json={"data": {
+        "header": {"fullName": "No Photo", "jobTitle": "", "photo": "", "links": []},
+    }})
+    resp = client.get("/cvs/1/view")
+    html = resp.get_data(as_text=True)
+    assert "#photo-container{display:none}" in html
+
+
+def test_view_cv_resolves_photo_when_set(client, registered_user):
+    _login(client, registered_user)
+    _create_cv(client)
+    client.post("/cvs/1/save", json={"data": {
+        "header": {"fullName": "Has Photo", "jobTitle": "", "photo": "/cvs/photos/99", "links": []},
+    }})
+    resp = client.get("/cvs/1/view")
+    html = resp.get_data(as_text=True)
+    assert 'src="/cvs/photos/99"' in html
+    assert "#photo-container{display:none}" not in html
+
+
+def test_view_version_renders_pinned_historical_data(client, registered_user, app):
+    """Restoring/viewing an old version should render THAT version's data,
+    not the current one."""
+    _login(client, registered_user)
+    _create_cv(client)
+    client.post("/cvs/1/save", json={"data": {
+        "header": {"fullName": "Version Two Name", "jobTitle": "", "photo": "", "links": []},
+    }})
+
+    with app.app_context():
+        v1 = CVVersion.query.filter_by(cv_id=1, version_number=1).first()
+
+    resp = client.get(f"/cvs/1/versions/{v1.id}/view")
+    assert resp.status_code == 200
+    html = resp.get_data(as_text=True)
+    assert "Version Two Name" not in html  # pinned to v1, not current v2
+
+
+def test_view_cv_requires_login(client):
+    resp = client.get("/cvs/1/view")
+    assert resp.status_code == 302
+    assert "/auth/login" in resp.headers["Location"]
+
+
 def _make_test_jpeg_bytes() -> bytes:
     from PIL import Image
     buf = io.BytesIO()
